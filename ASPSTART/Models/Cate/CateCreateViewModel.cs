@@ -1,0 +1,14 @@
+﻿
+using System.ComponentModel.DataAnnotations;
+
+namespace ASPSTART.Models.Cate;
+public class CateCreateViewModel
+{
+    [Display(Name = "Category Name")]
+    public string Name { get; set; } = string.Empty;
+    [Display(Name = "Description")]
+    public string? Description { get; set; } = string.Empty;
+
+    [Display(Name = "Image Url")]
+    public string ImageUrl { get; set; } = string.Empty;
+}
