@@ -11,7 +11,7 @@ namespace ASPSTART.Models.Cate
         [Display(Name = "Description")]
         public string? Description { get; set; } = string.Empty;
 
-        [Display(Name = "Image Url")]
-        public string ImageUrl { get; set; } = string.Empty;
+        [Display(Name = "Pick Photo")]
+        public IFormFile ImageFile { get; set; } = null!;
     }
 }

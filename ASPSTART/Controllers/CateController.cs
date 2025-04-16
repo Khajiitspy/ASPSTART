@@ -4,10 +4,14 @@ using ASPSTART.Data;
 using AutoMapper;
 using ASPSTART.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Webp;
+using ASPSTART.Interfaces;
 
 namespace ASPSTART.Controllers
 {
-    public class CateController(ASPSTARTDbContext context, IMapper mapper) : Controller
+    public class CateController(ASPSTARTDbContext context, IMapper mapper, IImageService imageService) : Controller
     {
 
         public IActionResult Index() //Це будь-який web результат - View - сторінка, Файл, PDF, Excel
@@ -25,15 +29,16 @@ namespace ASPSTART.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CateCreateViewModel model)
         {
-            var item = await context.Categories.FirstOrDefaultAsync(x => x.Name == model.Name);
-            if (item != null)
+            var entity = await context.Categories.FirstOrDefaultAsync(x => x.Name == model.Name);
+            if (entity != null)
             {
                 ModelState.AddModelError("Name", "Category with this name already exists");
                 return View(model);
             }
 
-            item = mapper.Map<CateEntity>(model);
-            await context.Categories.AddAsync(item);
+            entity = mapper.Map<CateEntity>(model);
+            entity.ImageUrl = await imageService.SaveImageAsync(model.ImageFile);
+            await context.Categories.AddAsync(entity);
             await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -74,7 +79,9 @@ namespace ASPSTART.Controllers
                 return View(model);
             }
 
-            mapper.Map(model, existing);
+            existing = mapper.Map(model, existing);
+            existing.ImageUrl = await imageService.SaveImageAsync(model.ImageFile);
+
             await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

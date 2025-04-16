@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="container">
-        <form asp-action="Edit" class="p-4 shadow rounded bg-light" style="max-width: 600px; margin: auto;">
+        <form asp-action="Edit" enctype="multipart/form-data" class="p-4 shadow rounded bg-light" style="max-width: 600px; margin: auto;">
             <h4 class="mb-4">Створення категорії</h4>
 
             <!-- Назва категорії -->
@@ -20,8 +20,8 @@
 
             <!-- Зображення (URL) -->
             <div class="mb-3">
-                <label asp-for="ImageUrl" class="form-label"></label>
-                <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg">
+                <label asp-for="ImageFile" class="form-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*">
             </div>
 
             <!-- Кнопка -->

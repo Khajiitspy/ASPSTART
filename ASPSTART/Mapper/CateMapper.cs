@@ -8,7 +8,8 @@ public class CateMapper : Profile
     {
         CreateMap<CateEntity, CateItemViewModel>()
             .ForMember(x => x.Image, opt => opt.MapFrom(x => x.ImageUrl));
-        CreateMap<CateCreateViewModel, CateEntity>();
+        CreateMap<CateCreateViewModel, CateEntity>()
+            .ForMember(x => x.ImageUrl, opt => opt.Ignore());
         CreateMap<CateEditViewModel, CateEntity>();
         CreateMap<CateEntity, CateEditViewModel>();
     }
