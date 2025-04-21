@@ -7,6 +7,29 @@ namespace ASPSTART.Services;
 
 public class ImageServices(IConfiguration configuration) : IImageService
 {
+    public async Task DeleteImageAsync(string name)
+    {
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+        var dir = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!);
+
+        Task[] tasks = sizes
+            .AsParallel()
+            .Select(size =>
+            {
+                return Task.Run(() =>
+                {
+                    var path = Path.Combine(dir, $"{size}_{name}");
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
+                });
+            })
+            .ToArray();
+
+        await Task.WhenAll(tasks);
+    }
+
     public async Task<string> SaveImageAsync(IFormFile file)
     {
         using MemoryStream ms = new();
@@ -17,23 +40,29 @@ public class ImageServices(IConfiguration configuration) : IImageService
         return imageName;
     }
 
-    private async Task<string> SaveImageAsync(byte[] bytes)
+    public async Task<string> SaveImageAsync(byte[] bytes)
     {
-        //string imageName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
         string imageName = $"{Path.GetRandomFileName()}.webp";
-        var sizes = configuration.GetSection("ImageSizes").Get<List<int>>();
-        Task[] tasks = sizes.AsParallel().Select(size => SaveImageAsync(bytes, imageName, size)).ToArray();
+        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
+
+        Task[] tasks = sizes
+            .AsParallel()
+            .Select(s => SaveImageAsync(bytes, imageName, s))
+            .ToArray();
+
         await Task.WhenAll(tasks);
+
         return imageName;
     }
 
     private async Task SaveImageAsync(byte[] bytes, string name, int size)
     {
-        var path = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!, $"{size}_{name}");
+        var path = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!,
+            $"{size}_{name}");
         using var image = Image.Load(bytes);
-        image.Mutate(async x =>
+        image.Mutate(async imgConext =>
         {
-            x.Resize(new ResizeOptions
+            imgConext.Resize(new ResizeOptions
             {
                 Size = new Size(size, size),
                 Mode = ResizeMode.Max

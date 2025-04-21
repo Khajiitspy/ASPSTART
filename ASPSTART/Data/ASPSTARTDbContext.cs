@@ -7,4 +7,5 @@ public class ASPSTARTDbContext : DbContext
     public ASPSTARTDbContext(DbContextOptions<ASPSTARTDbContext> opt) : base(opt) { }
 
     public DbSet<CateEntity> Categories { get; set; }
+    public DbSet<UserEntity> Users { get; set; }
 }

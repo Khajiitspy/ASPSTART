@@ -6,12 +6,16 @@ namespace ASPSTART.Models.Cate
     {
         public int Id { get; set; }
 
-        [Display(Name = "Category Name")]
+        [Required(ErrorMessage = "Добра закушуйте. Вкажіть назву :)")]
+        [Display(Name = "Назва категорії")]
         public string Name { get; set; } = string.Empty;
-        [Display(Name = "Description")]
+
+        [Display(Name = "Опис")]
         public string? Description { get; set; } = string.Empty;
 
-        [Display(Name = "Pick Photo")]
-        public IFormFile ImageFile { get; set; } = null!;
+        public string? ViewImage { get; set; } = string.Empty;
+
+        [Display(Name = "Оберіть фото")]
+        public IFormFile? ImageFile { get; set; } = null!;
     }
 }

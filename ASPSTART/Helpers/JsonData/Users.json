@@ -1,0 +1,16 @@
+﻿[
+  {
+    "Email": "john.doe@example.com",
+    "Name": "John",
+    "LastName": "Doe",
+    "Password": "password123",
+    "Avatar": "https://preview.redd.it/our-father-todd-howard-who-art-in-heaven-hallowed-be-thy-v0-zhaehvi4snvc1.jpg?width=1054&format=pjpg&auto=webp&s=3a4dbf89ebb757a89bf278f82e9450421470f362"
+  },
+  {
+    "Email": "jane.doe@example.com",
+    "Name": "Jane",
+    "LastName": "Doe",
+    "Password": "password456",
+    "Avatar": "https://www.meme-arsenal.com/memes/3426028afc456c855baf2341c5377b19.jpg"
+  }
+]

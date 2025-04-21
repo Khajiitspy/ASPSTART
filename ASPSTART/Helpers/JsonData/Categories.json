@@ -1,27 +1,27 @@
 ﻿[
-  //{
-  //  "Name": "Archer",
-  //  "Description": "Skilled at long range battles",
-  //  "Image": "https://wallpapercave.com/wp/wp3502520.jpg"
-  //},
-  //{
-  //  "Name": "Mage",
-  //  "Description": "Has vast knowledge in the magic arts",
-  //  "Image": "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/human-mage-world-of-warcraft-creationistlife.jpg"
-  //},
-  //{
-  //  "Name": "Bard",
-  //  "Description": "Knows how to lighten anyones mood.",
-  //  "Image": "https://www.giantbomb.com/a/uploads/scale_medium/1/17172/1362122-bard.jpg"
-  //},
-  //{
-  //  "Name": "Assassin",
-  //  "Description": "Skilled at stealth and quick assissinations.",
-  //  "Image": "https://i.pinimg.com/originals/9d/cf/f5/9dcff5805753a09544391093ceab945d.png"
-  //},
-  //{
-  //  "Name": "Monk",
-  //  "Description": "Mastered hand to hand combat. Does not rely on any weapon.",
-  //  "Image": "https://i.pinimg.com/originals/de/8e/94/de8e94611d020c4cc97e93ba355a8049.png"
-  //}
+  {
+    "Name": "Archer",
+    "Description": "Skilled at long range battles",
+    "Image": "https://wallpapercave.com/wp/wp3502520.jpg"
+  },
+  {
+    "Name": "Mage",
+    "Description": "Has vast knowledge in the magic arts",
+    "Image": "https://images.fineartamerica.com/images/artworkimages/mediumlarge/3/human-mage-world-of-warcraft-creationistlife.jpg"
+  },
+  {
+    "Name": "Bard",
+    "Description": "Knows how to lighten anyones mood.",
+    "Image": "https://www.giantbomb.com/a/uploads/scale_medium/1/17172/1362122-bard.jpg"
+  },
+  {
+    "Name": "Assassin",
+    "Description": "Skilled at stealth and quick assissinations.",
+    "Image": "https://i.pinimg.com/originals/9d/cf/f5/9dcff5805753a09544391093ceab945d.png"
+  },
+  {
+    "Name": "Monk",
+    "Description": "Mastered hand to hand combat. Does not rely on any weapon.",
+    "Image": "https://i.pinimg.com/originals/de/8e/94/de8e94611d020c4cc97e93ba355a8049.png"
+  }
 ]

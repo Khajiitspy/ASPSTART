@@ -10,7 +10,10 @@ public class CateMapper : Profile
             .ForMember(x => x.Image, opt => opt.MapFrom(x => x.ImageUrl));
         CreateMap<CateCreateViewModel, CateEntity>()
             .ForMember(x => x.ImageUrl, opt => opt.Ignore());
-        CreateMap<CateEditViewModel, CateEntity>();
-        CreateMap<CateEntity, CateEditViewModel>();
+        CreateMap<CateEntity, CateEditViewModel>()
+            .ForMember(x => x.ViewImage, opt => opt.MapFrom(x =>
+                string.IsNullOrEmpty(x.ImageUrl) ? "/im/default.svg" : $"/images/400_{x.ImageUrl}"))
+            .ForMember(x => x.ImageFile, opt => opt.Ignore())
+            .ReverseMap();
     }
 }

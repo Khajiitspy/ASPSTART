@@ -9,5 +9,6 @@ public class SeederMapper : Profile
     {
         CreateMap<SeederCateModel, CateEntity>()
             .ForMember(x => x.ImageUrl, opt => opt.MapFrom(x => x.Image));
+        CreateMap<SeederUserModel, UserEntity>();
     }
 }

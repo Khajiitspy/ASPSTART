@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ASPSTART.Models.Cate;
+using ASPSTART.Models.Users;
 using ASPSTART.Data;
 using AutoMapper;
 using ASPSTART.Data.Entities;
@@ -11,12 +11,12 @@ using ASPSTART.Interfaces;
 
 namespace ASPSTART.Controllers
 {
-    public class CateController(ASPSTARTDbContext context, IMapper mapper, IImageService imageService) : Controller
+    public class UserController(ASPSTARTDbContext context, IMapper mapper, IImageService imageService) : Controller
     {
 
-        public IActionResult Index() //Це будь-який web результат - View - сторінка, Файл, PDF, Excel
+        public IActionResult Index() 
         {
-            var model = mapper.ProjectTo<CateItemViewModel>(context.Categories).ToList();
+            var model = mapper.ProjectTo<UserViewModel>(context.Users).ToList();
             return View(model);
         }
 
@@ -24,21 +24,21 @@ namespace ASPSTART.Controllers
         public IActionResult Create()
         {
             return View();
-        }        
-        
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Create(CateCreateViewModel model)
+        public async Task<IActionResult> Create(UserCreateViewModel model)
         {
-            var entity = await context.Categories.FirstOrDefaultAsync(x => x.Name == model.Name);
+            var entity = await context.Users.FirstOrDefaultAsync(x => x.Name == model.Name);
             if (entity != null)
             {
                 ModelState.AddModelError("Name", "Category with this name already exists");
                 return View(model);
             }
 
-            entity = mapper.Map<CateEntity>(model);
-            entity.ImageUrl = await imageService.SaveImageAsync(model.ImageFile);
-            await context.Categories.AddAsync(entity);
+            entity = mapper.Map<UserEntity>(model);
+            entity.Avatar = await imageService.SaveImageAsync(model.Avatar);
+            await context.Users.AddAsync(entity);
             await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -47,33 +47,33 @@ namespace ASPSTART.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var category = await context.Categories.FindAsync(id);
+            var category = await context.Users.FindAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
 
-            ViewBag.ImageName = category.ImageUrl;
+            ViewBag.ImageName = category.Avatar;
 
-            var model = mapper.Map<CateEditViewModel>(category);
+            var model = mapper.Map<UserEditViewModel>(category);
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CateEditViewModel model)
+        public async Task<IActionResult> Edit(UserEditViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var existing = await context.Categories.FirstOrDefaultAsync(x => x.Id == model.Id);
+            var existing = await context.Users.FirstOrDefaultAsync(x => x.Id == model.Id);
             if (existing == null)
             {
                 return NotFound();
             }
 
-            var duplicate = await context.Categories
+            var duplicate = await context.Users
                 .FirstOrDefaultAsync(x => x.Name == model.Name && x.Id != model.Id);
             if (duplicate != null)
             {
@@ -83,10 +83,10 @@ namespace ASPSTART.Controllers
 
             existing = mapper.Map(model, existing);
 
-            if (model.ImageFile != null)
+            if (model.Avatar != null)
             {
-                await imageService.DeleteImageAsync(existing.ImageUrl);
-                existing.ImageUrl = await imageService.SaveImageAsync(model.ImageFile);
+                await imageService.DeleteImageAsync(existing.Avatar);
+                existing.Avatar = await imageService.SaveImageAsync(model.Avatar);
             }
             await context.SaveChangesAsync();
 
@@ -96,16 +96,17 @@ namespace ASPSTART.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await context.Categories.FindAsync(id);
+            var item = await context.Users.FindAsync(id);
             if (item == null)
             {
                 return NotFound();
             }
 
-            context.Categories.Remove(item);
+            context.Users.Remove(item);
             await context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
     }
 }
+

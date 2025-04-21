@@ -3,13 +3,105 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>З Великоднем!</title>
+    <title>Happy Easter!</title>
     <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        nav {
+            background-color: #9b7042;
+            padding: 10px;
+            border: solid;
+            border-width: 0px 0px 2px 0px;
+            border-color: #4d3718;
+            margin: 0px 0px 10px 0px;
+        }
+
+            nav ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+                nav ul li {
+                    display: inline-block;
+                    position: relative;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+
+                    nav ul li.right-align-dropdown ul {
+                        right: 0;
+                        left: auto;
+                    }
+
+                    nav ul li a {
+                        display: block;
+                        color: gainsboro;
+                        text-decoration: none;
+                        padding: 0px 10px;
+                    }
+
+                    nav ul li a.destination {
+                        display: block;
+                        color: gainsboro;
+                        text-decoration: none;
+                        padding: 0px 10px;
+                        border: solid;
+                        border-radius: 5px;
+                        border-color: transparent;
+                        border-width: 2px;
+                    }
+
+                            nav ul li a.destination:hover {
+                                background-color: darkgoldenrod;
+                                border-color: #4d3718;
+                            }
+
+                    nav ul li ul {
+                        display: none;
+                        position: absolute;
+                        background-color: #9b7042;
+                        min-width: 150px;
+                        border: solid;
+                        border-radius: 5px;
+                        border-color: #4d3718;
+                        border-width: 2px;
+                        font-size: 15px;
+                    }
+
+                    nav ul li:hover > ul {
+                        display: block;
+                    }
+
+                    nav ul li ul li {
+                        display: block;
+                        text-align: center;
+                    }
+    </style>
 </head>
 <body>
+    <nav>
+        <ul>
+            <li><a class="destination" href="@Url.Action("Index", "Cate")">Categories</a></li>
+            <li class="right-align-dropdown">
+                <a href="#">Account</a>
+                <ul>
+                    <li><a class="destination" href="@Url.Action("Create", "User")">Create</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+	<div class="container">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
 
-    @RenderBody()
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 
-    <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,33 +1,28 @@
 ﻿@model ASPSTART.Models.Cate.CateEditViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "CateEdit";
+    string imageView = String.IsNullOrEmpty(Model.ViewImage) ? "/DefualtImage.svg": $"/images/400_{Model.ViewImage}";
 }
 
-<h1>Редагувати категорію</h1>
+<h1>CateEdit</h1>
 
-
+<h4>CateEditViewModel</h4>
 <hr />
 <div class="row">
-    <div class="offset-md-3 col-md-6">
-        <form asp-action="Edit" enctype="multipart/form-data">
+    <div class="col-md-4">
+        <form asp-action="CateEdit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <input asp-for="ViewImage" type="hidden" />
-
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-
             <div class="row">
                 <div class="col-md-3">
                     <img src="@Model.ViewImage" width="100%" id="imagePreview" />
@@ -40,25 +35,17 @@
                     </div>
                 </div>
             </div>
-            
             <div class="form-group">
-                <input type="submit" value="Зберегти" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Повернути назад</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts { 
-     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-     <script>
-        document.getElementById("ImageFile").addEventListener("change", (e) => {
-            const file = e.target.files[0]; // Перший вибраний файл
-            if(file)
-                document.getElementById("imagePreview").src=URL.createObjectURL(file);
-        })
-     </script>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
