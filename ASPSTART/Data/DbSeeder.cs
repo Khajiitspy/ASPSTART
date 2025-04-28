@@ -7,6 +7,9 @@ using ASPSTART.Services;
 using ASPSTART.Interfaces;
 using System.Net;
 using Microsoft.CodeAnalysis.Scripting;
+using ASPSTART.Data.Entities.Identity;
+using ASPSTART.Constants;
+using Microsoft.AspNetCore.Identity;
 
 namespace ASPSTART.Data
 {
@@ -16,6 +19,7 @@ namespace ASPSTART.Data
         {
             using var scope = webApplication.Services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ASPSTARTDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
             var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
 
@@ -52,44 +56,64 @@ namespace ASPSTART.Data
                     Console.WriteLine("Not Found File Categories.json");
                 }
             }
-            if (!context.Users.Any())
+            if(!context.Roles.Any())
             {
-                var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Users.json");
-                if (File.Exists(jsonFile))
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<RoleEntity>>();
+                var admin = new RoleEntity { Name = Roles.Admin };
+                var result = await roleManager.CreateAsync(admin);
+                if (result.Succeeded)
                 {
-                    var jsonData = await File.ReadAllTextAsync(jsonFile);
-                    try
-                    {
-                        var users = JsonSerializer.Deserialize<List<SeederUserModel>>(jsonData);
-                        var userEntities = mapper.Map<List<UserEntity>>(users);
-
-                        foreach (var user in userEntities)
-                        {
-                            // Hash the password (if applicable)
-                            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-                            // Process avatar image
-                            if (!string.IsNullOrEmpty(user.Avatar))
-                            {
-                                using (WebClient client = new WebClient())
-                                {
-                                    byte[] bytes = await client.DownloadDataTaskAsync(user.Avatar);
-                                    user.Avatar = await imageService.SaveImageAsync(bytes);
-                                }
-                            }
-                        }
-
-                        await context.AddRangeAsync(userEntities);
-                        await context.SaveChangesAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error parsing Users.json: {0}", ex.Message);
-                    }
+                    Console.WriteLine($"Role {Roles.Admin} Created");
                 }
                 else
                 {
-                    Console.WriteLine("Users.json file not found.");
+                    Console.WriteLine($"Role Creation Failed:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"- {error.Code}: {error.Description}");
+                    }
+                }
+
+                var user = new RoleEntity { Name = Roles.User };
+                result = await roleManager.CreateAsync(user);
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"Role {Roles.User} Created");
+                }
+                else
+                {
+                    Console.WriteLine($"Role Creation Failed:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"- {error.Code}: {error.Description}");
+                    }
+                }
+
+            }
+            if (!context.Users.Any())
+            {
+                string email = "admin@gmail.com";
+                var user = new UserEntity
+                {
+                    UserName = email,
+                    Email = email,
+                    LastName = "Abyss",
+                    FirstName = "Magic",
+                };
+
+                var result = await userManager.CreateAsync(user, "123456");
+                if (result.Succeeded)
+                {
+                    Console.WriteLine($"User {user.FirstName}, {user.LastName} Created");
+                    await userManager.AddToRoleAsync(user, Roles.Admin);
+                }
+                else
+                {
+                    Console.WriteLine($"User Creation Failed:");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"- {error.Code}: {error.Description}");
+                    }
                 }
             }
         }

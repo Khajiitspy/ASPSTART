@@ -1,0 +1,14 @@
+﻿@model ASPSTART.Models.Account.ProfileViewModel
+
+<h2>Profile</h2>
+
+<div>
+    @if (!string.IsNullOrEmpty(Model.Image))
+    {
+        <p><strong>Profile Image:</strong></p>
+        <img src="/Images/400_@Model.Image" alt="Profile Image" style="width: 100px; height: 100px; border-radius: 50%; display:block;" />
+    }
+    <p><strong>First Name:</strong> @Model.FirstName</p>
+    <p><strong>Last Name:</strong> @Model.LastName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+</div>
