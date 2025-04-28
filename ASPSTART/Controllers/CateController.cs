@@ -8,6 +8,8 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Webp;
 using ASPSTART.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using ASPSTART.Constants;
 
 namespace ASPSTART.Controllers
 {
@@ -94,6 +96,7 @@ namespace ASPSTART.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = $"{Roles.Admin}")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await context.Categories.FindAsync(id);
