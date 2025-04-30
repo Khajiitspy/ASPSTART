@@ -1,4 +1,5 @@
-﻿﻿
+﻿@using ASPSTART.Constants
+﻿
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -7,79 +8,79 @@
     <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         nav {
-            background-color: #9b7042;
-            padding: 10px;
-            border: solid;
-            border-width: 0px 0px 2px 0px;
-            border-color: #4d3718;
-            margin: 0px 0px 10px 0px;
+        background-color: #9b7042;
+        padding: 10px;
+        border: solid;
+        border-width: 0px 0px 2px 0px;
+        border-color: #4d3718;
+        margin: 0px 0px 10px 0px;
         }
 
-            nav ul {
-                list-style-type: none;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+        nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
 
-                nav ul li {
-                    display: inline-block;
-                    position: relative;
-                    font-size: 20px;
-                    font-weight: bold;
-                }
+        nav ul li {
+        display: inline-block;
+        position: relative;
+        font-size: 20px;
+        font-weight: bold;
+        }
 
-                    nav ul li.right-align-dropdown ul {
-                        right: 0;
-                        left: auto;
-                    }
+        nav ul li.right-align-dropdown ul {
+        right: 0;
+        left: auto;
+        }
 
-                    nav ul li a {
-                        display: block;
-                        color: gainsboro;
-                        text-decoration: none;
-                        padding: 0px 10px;
-                    }
+        nav ul li a {
+        display: block;
+        color: gainsboro;
+        text-decoration: none;
+        padding: 0px 10px;
+        }
 
-                    nav ul li .destination {
-                        display: block;
-                        background-color: transparent;
-                        color: gainsboro;
-                        text-decoration: none;
-                        padding: 0px 10px;
-                        border: solid;
-                        border-radius: 5px;
-                        border-color: transparent;
-                        border-width: 2px;
-                    }
+        nav ul li .destination {
+        display: block;
+        background-color: transparent;
+        color: gainsboro;
+        text-decoration: none;
+        padding: 0px 10px;
+        border: solid;
+        border-radius: 5px;
+        border-color: transparent;
+        border-width: 2px;
+        }
 
-                            nav ul li .destination:hover {
-                                background-color: darkgoldenrod;
-                                border-color: #4d3718;
-                            }
+        nav ul li .destination:hover {
+        background-color: darkgoldenrod;
+        border-color: #4d3718;
+        }
 
-                    nav ul li ul {
-                        display: none;
-                        position: absolute;
-                        background-color: #9b7042;
-                        min-width: 150px;
-                        border: solid;
-                        border-radius: 5px;
-                        border-color: #4d3718;
-                        border-width: 2px;
-                        font-size: 15px;
-                    }
+        nav ul li ul {
+        display: none;
+        position: absolute;
+        background-color: #9b7042;
+        min-width: 150px;
+        border: solid;
+        border-radius: 5px;
+        border-color: #4d3718;
+        border-width: 2px;
+        font-size: 15px;
+        }
 
-                    nav ul li:hover > ul {
-                        display: block;
-                    }
+        nav ul li:hover > ul {
+        display: block;
+        }
 
-                    nav ul li ul li {
-                        display: block;
-                        text-align: center;
-                    }
+        nav ul li ul li {
+        display: block;
+        text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -89,15 +90,18 @@
             @if(User.Identity.IsAuthenticated)
             {
                 <li class="right-align-dropdown">
-                    <a href="@Url.Action("Profile", "Account")">@User.Identity.Name</a>
+                    @await Component.InvokeAsync("UserLink")
                     <ul>
+                        @if (User.IsInRole($"{Roles.Admin}"))
+                        {
+                            <li><a class="destination" href="@Url.Action("Index", "Users", new { area = "Admin" })">Admin Panel</a></li>
+                        }
                         <li>
                         @using(Html.BeginForm("Logout", "Account", FormMethod.Post))
                         {
-                           <button class="destination">Logout</button>
+                           <button class="destination">← Logout</button>
                         }
-                        </li>
-@*                         <li><a class="destination" href="@Url.Action("Prodile", "Account")">Profile</a></li> *@
+                        </li>                        
                     </ul>
                 </li>
             }

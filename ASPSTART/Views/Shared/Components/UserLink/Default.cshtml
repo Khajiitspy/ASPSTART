@@ -1,0 +1,7 @@
+﻿@model UserLinkViewModel
+
+<a href="@Url.Action("Profile", "Account")">
+    <img src="/images/50_@Model.Image" alt="@Model.Name"
+         style="height: 32px !important; width: 32px !important; border-radius: 50% !important;" />
+    @Model.Name
+</a>
