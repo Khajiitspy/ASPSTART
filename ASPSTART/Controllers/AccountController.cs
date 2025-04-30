@@ -61,21 +61,46 @@ namespace ASPSTART.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-
             var user = new UserEntity
             {
                 UserName = model.FirstName,
                 Email = model.Email,
                 LastName = model.LastName,
-                FirstName = model.FirstName,
-                Image = await imageService.SaveImageAsync(model.Image)
+                FirstName = model.FirstName
             };
+
+            if (model.Image.Length > 0)
+            {
+                user.Image = await imageService.SaveImageAsync(model.Image);
+            }
+            else
+            {
+                user.Image = "default.webp";
+            }
 
             var result = await userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
                 Console.WriteLine($"User {user.FirstName}, {user.LastName} Created");
-                await userManager.AddToRoleAsync(user, Roles.Admin);
+                await userManager.AddToRoleAsync(user, Roles.User);
+
+                // Logging the user in after sign up
+                user = await userManager.FindByEmailAsync(model.Email); // Making sure it gets the user I just added
+                if (user != null)
+                {
+                    var res = await signInManager.PasswordSignInAsync(user, model.Password, false, false);
+                    if (res.Succeeded)
+                    {
+                        await signInManager.SignInAsync(user, false);
+                        return Redirect("/");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Invalid login attempt");
+                        return View(model);
+                    }
+                }
+
                 return Redirect("/");
             }
             else

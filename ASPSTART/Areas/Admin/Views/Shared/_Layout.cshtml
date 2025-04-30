@@ -1,0 +1,27 @@
+﻿@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "Admin Panel";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@title</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark" style="padding: 3px 10px 3px 10px">
+        <a class="navbar-brand" href="@Url.Action("Index", "Cate", new { area = "" })"> ← Admin Panel</a>
+        <span class="navbar-text">Welcome, @User.Identity.Name</span>
+    </nav>
+
+    <div class="container mt-4">
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
