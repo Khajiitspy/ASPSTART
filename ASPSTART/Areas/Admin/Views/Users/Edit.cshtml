@@ -1,0 +1,191 @@
+@model UserEditViewModel
+@{
+  ViewData["Title"] = "Edit User";
+}
+
+<style>
+    #cropperImage {
+        max-width: 100%;
+        max-height: 65vh;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .modal-body {
+        padding: 0;
+    }
+</style>
+
+<div class="col-md-8">
+    <div class="card mb-8">
+        <h5 class="card-header">Edit</h5>
+        <div class="card-body demo-vertical-spacing demo-only-element">
+
+            <form id="editForm" enctype="multipart/form-data">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input asp-for="Id" type="hidden" />
+
+                <input asp-for="Image" type="hidden" />
+
+                <div class="row form-group">
+                    <div class="col-md-3">
+                        <img id="imagePreview" src="/images/100_@Model.Image" style="width: 100px; height: 100px; border-radius: 50%; display:block;" />
+                    </div>
+                    <div class="col-md-9">
+                        <div class="mb-3">
+                            <label asp-for="ImageFile" class="form-label"></label>
+                            <input name="AvatarPath" asp-for="ImageFile" type="file" class="form-control" accept="image/*" id="AvatarPath">
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="LastName" class="form-label"></label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-password-toggle">
+                    <label class="form-label" for="NewPassword">New Password</label>
+                    <div class="input-group input-group-merge">
+                        <input type="password" asp-for="NewPassword" class="form-control" id="basic-default-password32" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+                        <span asp-asp-validation-for="NewPassword" class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Roles</label>
+                    <select asp-for="SelectedRoles" asp-items="Model.AvailableRoles" class="form-control" multiple="multiple"></select>
+                </div>
+
+                <div class="form-group mt-5" style="display:flex; justify-content:space-evenly">
+                    <Button type="submit" class="btn btn-primary">Save</Button>
+                    <a class="btn btn-secondary" href="@Url.Action("Index", "Users")">Cancel</a>
+                </div>
+            </form>
+        </div>
+        <div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="cropperImage" style="max-width: 100%;" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cropAndSave" class="btn btn-primary">Crop and Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section CropperScript {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let cropper;
+            const form = document.getElementById('editForm');
+            const AvatarPath = document.getElementById('AvatarPath');
+            const imagePreview = document.getElementById('imagePreview');
+            const cropperImage = document.getElementById('cropperImage');
+            const cropAndSaveButton = document.getElementById('cropAndSave');
+            const cropperModalEl = document.getElementById('cropperModal');
+            const cropperModal = new bootstrap.Modal(cropperModalEl);
+
+            let croppedBlob = null;
+
+            AvatarPath.addEventListener('change', function (e) {
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        cropperImage.src = event.target.result;
+                        cropperModal.show();
+                    };
+                    reader.readAsDataURL(files[0]);
+                }
+            });
+
+            cropperModalEl.addEventListener('shown.bs.modal', function () {
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1
+                });
+            });
+
+            cropAndSaveButton.addEventListener('click', function () {
+                if (cropper) {
+                    cropper.getCroppedCanvas({ width: 200, height: 200 }).toBlob(function (blob) {
+                        croppedBlob = blob;
+                        const reader = new FileReader();
+                        reader.onloadend = function () {
+                            imagePreview.src = reader.result;
+                            cropperModal.hide();
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                if (croppedBlob) {
+                    formData.delete("ImageFile");
+                    formData.append("ImageFile", new File([croppedBlob], "avatar.png", { type: "image/png" }));
+                }
+
+                fetch('/Admin/Users/Edit', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    console.log("Server response:", data);
+                })
+                .catch(error => {
+                    console.error("Upload error:", error);
+                });
+            });
+        });
+    </script>
+
+}

@@ -8,11 +8,11 @@
     <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
         nav {
-        background-color: #9b7042;
+        background-color: #7e4ee6;
         padding: 10px;
         border: solid;
         border-width: 0px 0px 2px 0px;
-        border-color: #4d3718;
+        border-color: gainsboro;
         margin: 0px 0px 10px 0px;
         }
 
@@ -57,18 +57,18 @@
         }
 
         nav ul li .destination:hover {
-        background-color: darkgoldenrod;
-        border-color: #4d3718;
+        background-color: #7e4ee6;
+        border-color: gainsboro;
         }
 
         nav ul li ul {
         display: none;
         position: absolute;
-        background-color: #9b7042;
+        background-color: #7e4ee6;
         min-width: 150px;
         border: solid;
         border-radius: 5px;
-        border-color: #4d3718;
+        border-color: gainsboro;
         border-width: 2px;
         font-size: 15px;
         }
@@ -82,6 +82,7 @@
         text-align: center;
         }
     </style>
+    @await Html.PartialAsync("Sections/_Styles")
 </head>
 <body>
     <nav>
@@ -89,21 +90,7 @@
             <li><a class="destination" href="@Url.Action("Index", "Cate")">Fantes</a></li>
             @if(User.Identity.IsAuthenticated)
             {
-                <li class="right-align-dropdown">
-                    @await Component.InvokeAsync("UserLink")
-                    <ul>
-                        @if (User.IsInRole($"{Roles.Admin}"))
-                        {
-                            <li><a class="destination" href="@Url.Action("Index", "Users", new { area = "Admin" })">Admin Panel</a></li>
-                        }
-                        <li>
-                        @using(Html.BeginForm("Logout", "Account", FormMethod.Post))
-                        {
-                           <button class="destination">← Logout</button>
-                        }
-                        </li>                        
-                    </ul>
-                </li>
+                @await Component.InvokeAsync("UserLink")
             }
             else
             {
@@ -122,6 +109,8 @@
 			@RenderBody()
 		</main>
 	</div>
+
+    @await Html.PartialAsync("Sections/_Scripts")
 
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>

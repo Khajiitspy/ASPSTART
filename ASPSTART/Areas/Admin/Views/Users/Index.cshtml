@@ -1,35 +1,56 @@
-﻿@model List<(ASPSTART.Data.Entities.Identity.UserEntity User, IList<string> Roles)>
+﻿@* @model List<UserItemViewModel> *@
+@model List<(UserItemViewModel User, IList<string> Roles)>
 @{
-    ViewData["Title"] = "User List";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Admin Panel - Users";
 }
 
-<h2>User List</h2>
+<div class="card">
+	<h5 class="card-header">Users</h5>
+	<div class="table-responsive text-nowrap">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Icon</th>
+					<th>Name</th>
+					<th>Email</th>
+					<th>Roles</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody class="table-border-bottom-0">
+				@foreach (var item in Model)
+				{
+					var user = item.User;
+					var roles = item.Roles;
 
-@foreach (var entry in Model)
-{
-    var user = entry.User;
-    var roles = entry.Roles;
-
-    <div class="card mb-3 shadow-sm">
-        <div class="card-body d-flex align-items-center">
-            <img src="/images/100_@user.Image" style="height: 80px; width: 80px; border-radius: 50%;" />
-
-            <div style="margin-left: 20px">
-                <h5 class="card-title">@user.UserName</h5>
-                <p class="card-text">
-                    <strong>Email:</strong> @user.Email <br />
-                    <strong>Roles:</strong>
-                    @if (roles.Any())
-                    {
-                        @string.Join(", ", roles)
-                    }
-                    else
-                    {
-                        <span class="text-muted">None</span>
-                    }
-                </p>
-            </div>
-        </div>
-    </div>
-}
+					<tr style='background-color: @(roles.Contains("admin") ? "#DCC9FF" : "White") ;'>
+						<td>@user.Id</td>
+						<td><img style="height: 80px; width: 80px; border-radius: 50%;" src="/images/200_@user.Image" /></td>
+						<td>@user.LastName @user.FirstName</td>
+						<td>@user.Email</td>
+						<td>
+							@if (roles.Any())
+							{
+								@string.Join(", ", roles)
+							}
+							else
+							{
+								<span class="text-muted">None</span>
+							}
+						</td>
+						<td>
+							<div class="dropdown">
+								<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ri-more-2-line"></i></button>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" href="@Url.Action("Edit", "Users", new { id = user.Id })"><i class="ri-pencil-line me-1"></i> Edit</a>
+									<a class="dropdown-item" href="javascript:void(0);"><i class="ri-delete-bin-6-line me-1"></i> Delete</a>
+								</div>
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>

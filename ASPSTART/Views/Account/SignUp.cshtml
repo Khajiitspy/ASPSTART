@@ -22,7 +22,7 @@
 <h1 style="text-align:center">SignUp</h1>
 <div class="row">
     <div class="offset-md-4 col-md-6">
-        <form asp-action="SignUp" enctype="multipart/form-data">
+        <form id="signUpForm" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="row form-group">
@@ -89,56 +89,82 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet" />
 
     <script>
-        var cropper;
-        const imagePreview = document.getElementById('imagePreview');
-        const fileInput = document.getElementById('AvatarPath');
-        const cropperImage = document.getElementById('cropperImage');
-        const cropAndSaveButton = document.getElementById('cropAndSave');
-        const cropperModal = new bootstrap.Modal(document.getElementById('cropperModal'), {
-            backdrop: 'static',
-            keyboard: false
-        });
+        document.addEventListener('DOMContentLoaded', function () {
 
-        fileInput.addEventListener('change', function (e) {
-            const files = e.target.files;
-            if (files && files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    cropperImage.src = event.target.result;
-                    cropperModal.show();
-                };
-                reader.readAsDataURL(files[0]);
-            }
-        });
+            let cropper;  
+            const form = document.getElementById('signUpForm');
+            const AvatarPath = document.getElementById('AvatarPath');
+            const imagePreview = document.getElementById('imagePreview');
+            const cropperImage = document.getElementById('cropperImage');
+            const cropAndSaveButton = document.getElementById('cropAndSave');
+            const cropperModalEl = document.getElementById('cropperModal');
+            const cropperModal = new bootstrap.Modal(cropperModalEl);
 
-        document.getElementById('cropperModal').addEventListener('shown.bs.modal', function () {
-            if (cropper) {
-                cropper.destroy();
-            }
-            cropper = new Cropper(cropperImage, {
-                aspectRatio: 1,
-                viewMode: 1,
-                autoCropArea: 1,
-                movable: true,
-                cropBoxResizable: true
-            });
-        });
+            let croppedBlob = null;
 
-        cropAndSaveButton.addEventListener('click', function () {
-            console.log("Crop and Save clicked");
-            if (cropper) {
-                cropper.getCroppedCanvas({
-                    width: 200,
-                    height: 200
-                }).toBlob(function (blob) {
+            AvatarPath.addEventListener('change', function (e) {
+                const files = e.target.files;
+                if (files && files.length > 0) {
                     const reader = new FileReader();
-                    reader.onloadend = function () {
-                        imagePreview.src = reader.result;
-                        cropperModal.hide();
+                    reader.onload = function (event) {
+                        cropperImage.src = event.target.result;
+                        cropperModal.show();
                     };
-                    reader.readAsDataURL(blob);
+                    reader.readAsDataURL(files[0]);
+                }
+            });
+
+            cropperModalEl.addEventListener('shown.bs.modal', function () {
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(cropperImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1
                 });
-            }
+            });
+
+            cropAndSaveButton.addEventListener('click', function () {
+                if (cropper) {
+                    cropper.getCroppedCanvas({ width: 200, height: 200 }).toBlob(function (blob) {
+                        croppedBlob = blob;
+                        const reader = new FileReader();
+                        reader.onloadend = function () {
+                            imagePreview.src = reader.result;
+                            cropperModal.hide();
+                        };
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            });
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                if (croppedBlob) {
+                    formData.delete("Image");
+                    formData.append("Image", new File([croppedBlob], "avatar.png", { type: "image/png" }));
+                }
+
+                fetch('/Account/SignUp', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        return response.text();
+                    }
+                })
+                .then(data => {
+                    console.log("Server response:", data);
+                })
+                .catch(error => {
+                    console.error("Upload error:", error);
+                });
+            });
         });
     </script>
 }
