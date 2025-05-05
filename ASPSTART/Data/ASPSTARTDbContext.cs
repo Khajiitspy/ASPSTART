@@ -9,6 +9,8 @@ public class ASPSTARTDbContext : IdentityDbContext<UserEntity, RoleEntity, int>
     public ASPSTARTDbContext(DbContextOptions<ASPSTARTDbContext> opt) : base(opt) { }
 
     public DbSet<CateEntity> Categories { get; set; }
+    public DbSet<ProductEntity> Products { get; set; }
+    public DbSet<ProductImageEntity> ProductImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

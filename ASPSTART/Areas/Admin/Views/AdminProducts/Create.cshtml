@@ -1,0 +1,122 @@
+﻿@model ASPSTART.Areas.Admin.Models.Products.ProductCreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="col-md-8">
+    <div class="card mb-8" style="padding: 10px;">
+        <h5 class="card-header">Create Product</h5>
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="ImageOrder" id="imageOrder" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Roles</label>
+                <select asp-for="CategoryId" asp-items="Model.AvailableCategories" class="form-control"></select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Images</label>
+                <input type="file" class="form-control" name="Images" multiple id="imageInput" accept="image/*" />
+                <input type="hidden" name="ImageOrder" id="imageOrder" />
+                <div id="imagePreviewContainer" class="d-flex flex-wrap mt-3 gap-2"></div>
+            </div>
+
+            <div class="form-group mt-5" style="display:flex; justify-content:space-evenly">
+                <Button type="submit" class="btn btn-primary">Add</Button>
+                <a class="btn btn-secondary" href="@Url.Action("Index")">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageInput = document.getElementById('imageInput');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const imageOrderInput = document.getElementById('imageOrder');
+
+            let filesArray = [];
+
+            imageInput.addEventListener('change', function () {
+                filesArray = Array.from(this.files);
+                renderPreviews();
+
+                imageOrderInput.value = filesArray.map((_, i) => i).join(',');
+            });
+
+            function renderPreviews() {
+                previewContainer.innerHTML = '';
+
+                filesArray.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'position-relative border p-1 rounded';
+                        wrapper.style.width = '120px';
+                        wrapper.draggable = true;
+                        wrapper.dataset.index = index;
+
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-thumbnail';
+                        img.style.width = '100%';
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.type = 'button';
+                        removeBtn.textContent = '×';
+                        removeBtn.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
+                        removeBtn.style.zIndex = '1';
+                        removeBtn.onclick = function () {
+                            filesArray.splice(index, 1);
+                            renderPreviews();
+                            setTimeout(updateImageOrder, 100);
+                        };
+
+                        wrapper.appendChild(removeBtn);
+                        wrapper.appendChild(img);
+                        previewContainer.appendChild(wrapper);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            Sortable.create(previewContainer, {
+                animation: 150,
+                onSort: updateImageOrder
+            });
+
+            function updateImageOrder() {
+                const order = [];
+                previewContainer.querySelectorAll('div[data-index]').forEach((div) => {
+                    const index = parseInt(div.dataset.index);
+                    if (!isNaN(index)) {
+                        order.push(index);
+                    }
+                });
+                imageOrderInput.value = order.join(',');
+            }
+        });
+    </script>
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

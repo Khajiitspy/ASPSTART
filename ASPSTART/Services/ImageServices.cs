@@ -70,4 +70,11 @@ public class ImageServices(IConfiguration configuration) : IImageService
             await image.SaveAsync(path, new WebpEncoder());
         });
     }
+
+    public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+    {
+        using var httpClient = new HttpClient();
+        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+        return await SaveImageAsync(imageBytes);
+    }
 }

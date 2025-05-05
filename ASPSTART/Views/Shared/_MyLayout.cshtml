@@ -87,7 +87,12 @@
 <body>
     <nav>
         <ul>
-            <li><a class="destination" href="@Url.Action("Index", "Cate")">Fantes</a></li>
+            <li>
+                <div style="display:flex; align-items:center">
+                    <a class="destination" style="font-size: 26px;" href="@Url.Action("Index", "Products")">Fantes</a>
+                    <a class="destination" href="@Url.Action("Index", "Cate")">Categories</a>
+                </div>
+            </li>
             @if(User.Identity.IsAuthenticated)
             {
                 @await Component.InvokeAsync("UserLink")
