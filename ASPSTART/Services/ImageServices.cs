@@ -30,6 +30,14 @@ public class ImageServices(IConfiguration configuration) : IImageService
         await Task.WhenAll(tasks);
     }
 
+    public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+    {
+        using var httpClient = new HttpClient();
+        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+        return await SaveImageAsync(imageBytes);
+    }
+
+
     public async Task<string> SaveImageAsync(IFormFile file)
     {
         using MemoryStream ms = new();
@@ -40,19 +48,38 @@ public class ImageServices(IConfiguration configuration) : IImageService
         return imageName;
     }
 
-    public async Task<string> SaveImageAsync(byte[] bytes)
+    public async Task<string> SaveImageAsync(byte[] bytes, bool dynamic = true)
     {
         string imageName = $"{Path.GetRandomFileName()}.webp";
-        var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
 
-        Task[] tasks = sizes
-            .AsParallel()
-            .Select(s => SaveImageAsync(bytes, imageName, s))
-            .ToArray();
+        if (dynamic)
+        {
+            var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
 
-        await Task.WhenAll(tasks);
+            Task[] tasks = sizes
+                .AsParallel()
+                .Select(s => SaveImageAsync(bytes, imageName, s))
+                .ToArray();
+
+            await Task.WhenAll(tasks);
+        }
+        else
+        {
+            await SaveImageAsync(bytes, imageName);
+        }
 
         return imageName;
+    }
+
+    public async Task<string> SaveImageFromBase64Async(string input, bool dynamic = true)
+    {
+        var base64Data = input.Contains(",")
+           ? input.Substring(input.IndexOf(",") + 1)
+           : input;
+
+        byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+        return await SaveImageAsync(imageBytes, dynamic);
     }
 
     private async Task SaveImageAsync(byte[] bytes, string name, int size)
@@ -71,10 +98,11 @@ public class ImageServices(IConfiguration configuration) : IImageService
         });
     }
 
-    public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+    private async Task SaveImageAsync(byte[] bytes, string name)
     {
-        using var httpClient = new HttpClient();
-        var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
-        return await SaveImageAsync(imageBytes);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!,
+            name);
+        using var image = Image.Load(bytes);
+        await image.SaveAsync(path, new WebpEncoder());
     }
 }

@@ -19,12 +19,13 @@
             </div>
             <div class="mb-3">
                 <label asp-for="Description" class="form-label"></label>
-                <input asp-for="Description" class="form-control" />
+                <textarea asp-for="Description" id="description" class="form-control" rows="4" placeholder="Describe your product"></textarea>
+@*                 <input asp-for="Description" class="form-control" /> *@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Roles</label>
+                <label class="form-label">Class</label>
                 <select asp-for="CategoryId" asp-items="Model.AvailableCategories" class="form-control"></select>
             </div>
 
@@ -44,10 +45,51 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.tiny.cloud/1/7nkr5q7xx8kfm30xn3tvkrbmm0wuwyyxr8h6jtdnnrb8652m/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
+            // tinymce.init({
+            //     selector: '#description',
+            //     plugins: 'advlist autolink link image lists charmap preview anchor pagebreak searchreplace wordcount code fullscreen insertdatetime media table help',
+            //     toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | preview fullscreen',
+            //     menubar: 'file edit view insert format tools table help'
+            // });
+
+            tinymce.init({
+                selector: '#description', // or your textarea ID
+                plugins: 'advlist autolink link image lists charmap preview anchor pagebreak searchreplace wordcount code fullscreen insertdatetime media table help',
+                toolbar: 'undo redo | styles | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | preview fullscreen | code | image',
+                automatic_uploads: false,
+                images_upload_handler: null,
+                images_reuse_filename: false,
+                file_picker_types: 'image',
+                file_picker_callback: function (cb, value, meta) {
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/*');
+
+                    input.onchange = function () {
+                        const file = this.files[0];
+                        const reader = new FileReader();
+
+                        reader.onload = function () {
+                            cb(reader.result, { title: file.name });
+                        };
+
+                        reader.readAsDataURL(file); // embeds the image as a data URI
+                    };
+
+                    input.click();
+                },
+                menubar: 'file edit view insert format tools table help'
+            });
+
+
+
+
             const imageInput = document.getElementById('imageInput');
             const previewContainer = document.getElementById('imagePreviewContainer');
             const imageOrderInput = document.getElementById('imageOrder');
@@ -55,8 +97,10 @@
             let filesArray = [];
 
             imageInput.addEventListener('change', function () {
-                filesArray = Array.from(this.files);
+                filesArray = filesArray.concat(Array.from(this.files));
                 renderPreviews();
+
+                console.log(filesArray);
 
                 imageOrderInput.value = filesArray.map((_, i) => i).join(',');
             });
