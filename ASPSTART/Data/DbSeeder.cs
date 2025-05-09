@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Scripting;
 using ASPSTART.Data.Entities.Identity;
 using ASPSTART.Constants;
 using Microsoft.AspNetCore.Identity;
+using ASPSTART.SMTP;
 
 namespace ASPSTART.Data
 {
@@ -22,6 +23,7 @@ namespace ASPSTART.Data
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
             var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
             var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
+            var SMTPService = scope.ServiceProvider.GetRequiredService<ISMTPService>();
 
             context.Database.Migrate();
 
@@ -174,6 +176,24 @@ namespace ASPSTART.Data
                     Console.WriteLine("Products.json file not found");
                 }
             }
+
+
+
+            //webApplication.Use(async (context, next) =>
+            //{
+            //    var host = context.Request.Host.Host;
+
+            //    Message msgEmail = new Message
+            //    {
+            //        Body = $"Додаток успішно запущено {DateTime.Now}",
+            //        Subject = $"Запуск сайту {host}",
+            //        To = "artyrhamuliak@gmail.com",
+            //    };
+            //    Console.WriteLine(host);
+
+            //    await SMTPService.SendMessage(msgEmail);
+            //    await next.Invoke();
+            //});
         }
     }
 }

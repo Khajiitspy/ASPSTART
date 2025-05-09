@@ -2,12 +2,15 @@
 using ASPSTART.Data.Entities.Identity;
 using ASPSTART.Interfaces;
 using ASPSTART.Models.Account;
+using ASPSTART.SMTP;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using WebSmonder.Services;
 
 namespace ASPSTART.Controllers
 {
-    public class AccountController(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IImageService imageService) : Controller
+    public class AccountController(UserManager<UserEntity> userManager, SignInManager<UserEntity> signInManager, IImageService imageService, ISMTPService sMTPService) : Controller
     {
         [HttpGet]
         public IActionResult Login()
@@ -134,6 +137,108 @@ namespace ASPSTART.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user==null)
+            {
+                ModelState.AddModelError("", "Invalid email");
+                return View(model);
+            }
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetUrl = Url.Action(
+                "ResetPassword",
+                "Account",
+                new { email = user.Email, token },
+                protocol: Request.Scheme);
+
+            Message msgEmail = new Message
+            {
+                Body = $"Reset Password <a href='{resetUrl}'>Reset Password</a>",
+                Subject = $"Sending Password",
+                To = model.Email,
+            };
+
+            var result = await sMTPService.SendMessageAsync(msgEmail);
+
+            if (!result)
+            {
+                ModelState.AddModelError("", "Error sending email");
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(ForgotPasswordSend));
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordSend()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string email, string token)
+        {
+            var model = new ResetPasswordViewModel
+            {
+                Email = email,
+                Token = token
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if(model.Password != model.ConfirmPassword)
+            {
+                ModelState.AddModelError("", "Passwords do not match");
+                return View(model);
+            }
+            else
+            {
+                var user = await userManager.FindByEmailAsync(model.Email);
+
+                if(user == null)
+                {
+                    ModelState.AddModelError("", "Invalid email");
+                    return View(model);
+                }
+
+                var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction(nameof(Login));
+                }
+                else
+                {
+                    ModelState.AddModelError("", $"{result.ToString()}");
+                    return View(model);
+                }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using ASPSTART.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using WebSmonder.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IImageService, ImageServices>();
+builder.Services.AddScoped<ISMTPService, SMTPService>();
 
 var app = builder.Build();
 

@@ -20,9 +20,12 @@
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
+            <div class="text-end">
+                <a asp-action="ForgotPassword" class="btn btn-link">Forgot Password?</a>
+            </div>
             <div class="mb-3">
                 <input type="submit" value="Login" class="btn btn-primary" />
-                <a href="#" class="btn btn-light">Sign up</a>
+                <a asp-action="SignUp" class="btn btn-light">Sign up</a>
             </div>
         </form>
     </div>
