@@ -1,5 +1,5 @@
 ﻿using ASPSTART.Data.Entities;
-using ASPSTART.Models.Product;
+using ASPSTART.Models.Products;
 using AutoMapper;
 namespace WebSmonder.Mapper;
 

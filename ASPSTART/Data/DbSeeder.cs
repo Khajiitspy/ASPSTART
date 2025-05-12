@@ -121,6 +121,7 @@ namespace ASPSTART.Data
 
             if (!context.Products.Any())
             {
+                //var imageService = scope.ServiceProvider.GetRequiredService<IImageService>();
                 var jsonFile = Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "JsonData", "Products.json");
 
                 if (File.Exists(jsonFile))
@@ -151,14 +152,23 @@ namespace ASPSTART.Data
                             };
 
                             int priority = 0;
-                            foreach (var imageUrl in product.Images)
+                            try
                             {
-                                var savedImageUrl = await imageService.SaveImageFromUrlAsync(imageUrl);
-                                productEntity.ProductImages.Add(new ProductImageEntity
+                                foreach (var imageUrl in product.Images)
                                 {
-                                    Name = savedImageUrl,
-                                    Priotity = priority++
-                                });
+
+                                    var savedImageUrl = await imageService.SaveImageFromUrlAsync(imageUrl);
+                                    productEntity.ProductImages.Add(new ProductImageEntity
+                                    {
+                                        Name = savedImageUrl,
+                                        Priotity = priority++
+                                    });
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("-----Error Add {0}------", ex.Message);
+                                continue;
                             }
 
                             await context.Products.AddAsync(productEntity);
@@ -178,22 +188,6 @@ namespace ASPSTART.Data
             }
 
 
-
-            //webApplication.Use(async (context, next) =>
-            //{
-            //    var host = context.Request.Host.Host;
-
-            //    Message msgEmail = new Message
-            //    {
-            //        Body = $"Додаток успішно запущено {DateTime.Now}",
-            //        Subject = $"Запуск сайту {host}",
-            //        To = "artyrhamuliak@gmail.com",
-            //    };
-            //    Console.WriteLine(host);
-
-            //    await SMTPService.SendMessage(msgEmail);
-            //    await next.Invoke();
-            //});
         }
     }
 }

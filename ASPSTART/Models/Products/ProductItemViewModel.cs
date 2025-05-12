@@ -1,4 +1,4 @@
-﻿namespace ASPSTART.Models.Product
+﻿namespace ASPSTART.Models.Products
 {
     public class ProductItemViewModel
     {

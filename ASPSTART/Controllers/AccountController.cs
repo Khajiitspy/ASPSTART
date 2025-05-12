@@ -170,7 +170,7 @@ namespace ASPSTART.Controllers
 
             Message msgEmail = new Message
             {
-                Body = $"Reset Password <a href='{resetUrl}'>Reset Password</a>",
+                Body = $"Click Here to Reset Password <a href='{resetUrl}'>Reset Password</a>",
                 Subject = $"Sending Password",
                 To = model.Email,
             };
